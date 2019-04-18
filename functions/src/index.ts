@@ -82,3 +82,32 @@ app.patch('/register/:licenseId', (req, res) => {
             }
         });
 })
+
+// Authorization
+app.post('/authorization', (req, res) => {
+    const licenseId = req.body.license;
+    const token = req.body.token;
+    firebaseHelper.firestore
+        .checkDocumentExists(db, licensesCollection, licenseId)
+        .then(result => {
+            if (!result.exists) {
+                res.send({ message: `${licenseId} 無效`, data: [] });
+            } else {
+                const data = result.data;
+
+                if (data.regular) {
+                    res.send({ data: data.authorizations });
+                } else if (token != data.token) {
+                    res.send({ message: `${licenseId} 尚未驗證`, data: [] });
+                } else {
+                    const currentTime = dayjs();
+                    const expireAt = dayjs(data.expireAt);
+                    if (currentTime.isBefore(expireAt)) {
+                        res.send({ data: data.authorizations });
+                    } else {
+                        res.send({ message: `${licenseId} 已過期`, data: [] });
+                    }
+                }
+            }
+        });
+});
