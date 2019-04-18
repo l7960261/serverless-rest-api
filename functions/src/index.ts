@@ -71,10 +71,10 @@ app.patch('/register/:licenseId', (req, res) => {
         .checkDocumentExists(db, licensesCollection, licenseId)
         .then(result => {
             if (!result.exists) {
-                res.send(licenseId + ' is not correct');
+                res.send(`${licenseId} is not correct`);
             } else {
-                console.log('Register from: ' + req.connection.remoteAddress);
                 const token = uuidv1();
+                console.log(`Register from: ${req.connection.remoteAddress} Token: ${token}`);
 
                 firebaseHelper.firestore
                     .updateDocument(db, licensesCollection, licenseId, { token });
