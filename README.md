@@ -19,7 +19,7 @@ You can follow the guide on [Medium](https://medium.com/@dalenguyen/building-a-s
 ## Clone this repository
 
 ```
-git clone git@github.com:dalenguyen/serverless-rest-api.git .
+git clone https://github.com/l7960261/serverless-rest-api.git .
 ```
 
 You need to change the firebase project name in *.firebaserc* file.
