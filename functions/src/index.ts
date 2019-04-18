@@ -64,8 +64,8 @@ app.delete('/licenses/:licenseId', (req, res) => {
     res.send('License is deleted');
 })
 
-// Register a license
-app.patch('/register/:licenseId', (req, res) => {
+// Activate a license
+app.patch('/activation/:licenseId', (req, res) => {
     const licenseId = req.params.licenseId;
     firebaseHelper.firestore
         .checkDocumentExists(db, licensesCollection, licenseId)
@@ -74,7 +74,7 @@ app.patch('/register/:licenseId', (req, res) => {
                 res.send(`${licenseId} is not correct`);
             } else {
                 const token = uuidv1();
-                console.log(`Register from: ${req.connection.remoteAddress} Token: ${token}`);
+                console.log(`Activation from: ${req.connection.remoteAddress} Token: ${token}`);
 
                 firebaseHelper.firestore
                     .updateDocument(db, licensesCollection, licenseId, { token });
