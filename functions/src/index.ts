@@ -101,8 +101,8 @@ app.post('/authorization', (req, res) => {
                     res.send({ message: `${licenseId} 尚未驗證`, data: [] });
                 } else {
                     const currentTime = dayjs();
-                    const expireAt = dayjs(data.expireAt);
-                    if (currentTime.isBefore(expireAt)) {
+                    const expiredAt = dayjs(data.expiredAt);
+                    if (currentTime.isBefore(expiredAt)) {
                         res.send({ data: data.authorizations });
                     } else {
                         res.send({ message: `${licenseId} 已過期`, data: [] });
