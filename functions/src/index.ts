@@ -4,7 +4,8 @@ import admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import * as firebaseHelper from 'firebase-functions-helper';
 import serviceAccount from './serviceAccountKey.json';
-import dayjs from 'dayjs'
+import dayjs from 'dayjs';
+import uuidv1 from 'uuid/v1';
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount as any),
@@ -61,4 +62,23 @@ app.delete('/licenses/:licenseId', (req, res) => {
     firebaseHelper.firestore
         .deleteDocument(db, licensesCollection, req.params.licenseId);
     res.send('License is deleted');
+})
+
+// Register a license
+app.patch('/register/:licenseId', (req, res) => {
+    const licenseId = req.params.licenseId;
+    firebaseHelper.firestore
+        .checkDocumentExists(db, licensesCollection, licenseId)
+        .then(result => {
+            if (!result.exists) {
+                res.send(licenseId + ' is not correct');
+            } else {
+                console.log('Register from: ' + req.connection.remoteAddress);
+                const token = uuidv1();
+
+                firebaseHelper.firestore
+                    .updateDocument(db, licensesCollection, licenseId, { token });
+                res.send(token);
+            }
+        });
 })
