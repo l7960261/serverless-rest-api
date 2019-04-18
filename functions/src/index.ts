@@ -1,10 +1,15 @@
 import * as functions from 'firebase-functions';
-import * as admin from 'firebase-admin';
+import admin from 'firebase-admin';
 import * as firebaseHelper from 'firebase-functions-helper';
-import * as express from 'express';
+import express from 'express';
 import * as bodyParser from "body-parser";
+import serviceAccount from './serviceAccountKey.json';
 
-admin.initializeApp(functions.config().firebase);
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount as any),
+    databaseURL: serviceAccount['database_url']
+});
+
 const db = admin.firestore();
 
 const app = express();
@@ -22,7 +27,8 @@ export const webApi = functions.https.onRequest(main);
 // Add new contact
 app.post('/contacts', (req, res) => {
     firebaseHelper.firestore
-        .creatNewDocument(db, contactsCollection, req.body);
+        .createNewDocument(db, contactsCollection, req.body)
+        .then(docRef => console.log(docRef.id));
     res.send('Create a new contact');
 })
 
