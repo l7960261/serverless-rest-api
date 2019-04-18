@@ -1,3 +1,5 @@
+[![Dependency Status](https://david-dm.org/l7960261/serverless-rest-api.svg)](https://david-dm.org/l7960261/serverless-rest-api/functions) [![devDependency Status](https://david-dm.org/l7960261/serverless-rest-api/dev-status.svg)](https://david-dm.org/l7960261/serverless-rest-api/functions?type=dev)
+
 # Building Serverless RESTful Web APIs with Cloud Functions, Firestore, Express and TypeScript
 
 This is a simple API that saves contact information of people. 
