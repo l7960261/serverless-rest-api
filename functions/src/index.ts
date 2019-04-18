@@ -11,7 +11,6 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
-
 const app = express();
 const main = express();
 
@@ -22,7 +21,6 @@ main.use(bodyParser.urlencoded({ extended: false }));
 const contactsCollection = 'contacts';
 
 export const webApi = functions.https.onRequest(main);
-
 
 // Add new contact
 app.post('/contacts', (req, res) => {
