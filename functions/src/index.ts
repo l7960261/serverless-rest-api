@@ -70,15 +70,21 @@ app.patch('/activation/:licenseId', (req, res) => {
     firebaseHelper.firestore
         .checkDocumentExists(db, licensesCollection, licenseId)
         .then(result => {
-            if (!result.exists) {
-                res.send(`${licenseId} is not correct`);
+            const notExists = !result.exists;
+            const doc = result.data || {};
+            const hasTokenButNotRegular = () => doc.token && !doc.regular;
+
+            if (notExists) {
+                res.send({ message: `${licenseId} is not correct` });
+            } else if (hasTokenButNotRegular()) {
+                res.send({ message: `${licenseId} activated already` } );
             } else {
                 const token = uuidv1();
                 console.log(`Activation from: ${req.connection.remoteAddress} Token: ${token}`);
 
                 firebaseHelper.firestore
                     .updateDocument(db, licensesCollection, licenseId, { token });
-                res.send(token);
+                res.send({ data: token });
             }
         });
 })
