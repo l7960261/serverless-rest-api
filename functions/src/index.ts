@@ -80,8 +80,7 @@ app.patch('/activation/:licenseId', (req, res) => {
                 res.send({ message: `${licenseId} activated already` });
             } else {
                 const token = uuidv1();
-                console.log(`activation Ip:${req.connection.remoteAddress} Token:${token}`);
-
+                console.log(`Activate from Ip:${req.connection.remoteAddress} Token:${token}`);
                 firebaseHelper.firestore
                     .updateDocument(db, licensesCollection, licenseId, { token });
                 res.send({ data: token });
@@ -102,18 +101,18 @@ app.post('/authorization', (req, res) => {
                 const data = result.data;
 
                 if (data.regular) {
-                    console.log(`authorization {Regular} Ip:${req.connection.remoteAddress}`);
+                    console.log(`Authorization is regular, Ip:${req.connection.remoteAddress}`);
                     res.send({ data: data.authorizations });
                 } else if (token != data.token) {
-                    console.log(`authorization {TokenError} Ip:${req.connection.remoteAddress} Info:${JSON.stringify(data)}`);
+                    console.log(`Authorization is token error, Ip:${req.connection.remoteAddress} Info:${JSON.stringify(data)}`);
                     res.send({ message: `${licenseId} 尚未驗證`, data: [] });
                 } else {
-                    const currentTime = dayjs();
+                    const currentTime = dayjs().add(8, 'hour');
                     const expiredAt = dayjs(data.expiredAt);
                     if (currentTime.isBefore(expiredAt)) {
                         res.send({ data: data.authorizations });
                     } else {
-                        console.log(`authorization {Expired} Ip:${req.connection.remoteAddress} Info:${JSON.stringify(data)}`);
+                        console.log(`Authorization is expired, Ip:${req.connection.remoteAddress} Info:${JSON.stringify(data)}`);
                         res.send({ message: `${licenseId} 已過期`, data: [] });
                     }
                 }
