@@ -33,26 +33,26 @@ app.post('/licenses', (req, res) => {
 
     firebaseHelper.firestore
         .createNewDocument(db, licensesCollection, data)
-    res.send('Create a new license');
+    return res.send('Create a new license');
 })
 
 // Update new license
 app.patch('/licenses/:licenseId', (req, res) => {
     firebaseHelper.firestore
         .updateDocument(db, licensesCollection, req.params.licenseId, req.body);
-    res.send('Update a new license');
+    return res.send('Update a new license');
 })
 
 // View a license
 app.get('/licenses/:licenseId', (req, res) => {
-    firebaseHelper.firestore
+    return firebaseHelper.firestore
         .getDocument(db, licensesCollection, req.params.licenseId)
         .then(doc => res.status(200).send(doc));
 })
 
 // View all licenses
 app.get('/licenses', (req, res) => {
-    firebaseHelper.firestore
+    return firebaseHelper.firestore
         .backup(db, licensesCollection)
         .then(data => res.status(200).send(data))
 })
@@ -61,13 +61,13 @@ app.get('/licenses', (req, res) => {
 app.delete('/licenses/:licenseId', (req, res) => {
     firebaseHelper.firestore
         .deleteDocument(db, licensesCollection, req.params.licenseId);
-    res.send('License is deleted');
+    return res.send('License is deleted');
 })
 
 // Activate a license
 app.patch('/activation/:licenseId', (req, res) => {
     const licenseId = req.params.licenseId;
-    firebaseHelper.firestore
+    return firebaseHelper.firestore
         .checkDocumentExists(db, licensesCollection, licenseId)
         .then(result => {
             const notExists = !result.exists;
@@ -92,7 +92,8 @@ app.patch('/activation/:licenseId', (req, res) => {
 app.post('/authorization', (req, res) => {
     const licenseId = req.body.license;
     const token = req.body.token;
-    firebaseHelper.firestore
+
+    return firebaseHelper.firestore
         .checkDocumentExists(db, licensesCollection, licenseId)
         .then(result => {
             if (!result.exists) {
