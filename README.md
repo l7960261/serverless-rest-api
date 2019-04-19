@@ -16,6 +16,8 @@ npm install -g firebase-tools
 
 You can follow the guide on [Medium](https://medium.com/@dalenguyen/building-a-serverless-restful-api-with-cloud-functions-firestore-and-express-f917a305d4e6) or clone this repository.
 
+Use packages [firebase-functions-helper](https://github.com/dalenguyen/firebase-functions-helper/blob/master/docs/firestore.md)
+
 ## Clone this repository
 
 ```
