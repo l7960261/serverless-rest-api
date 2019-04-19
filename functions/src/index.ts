@@ -31,9 +31,9 @@ app.post('/licenses', (req, res) => {
     data.createdAt = dayjs().add(8, 'hour').format(formatTemplate);
     data.expiredAt = dayjs(data.createdAt).add(30, 'day').format(formatTemplate);
 
-    return firebaseHelper.firestore
+    firebaseHelper.firestore
         .createNewDocument(db, licensesCollection, data)
-        .then(docRef => res.send({ message: 'Create a new license', data: docRef.id }));
+    return res.send({ message: 'Create a new license', data: [] });
 })
 
 // Update new license
