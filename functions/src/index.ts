@@ -67,19 +67,32 @@ app.delete('/licenses/:licenseId', (req, res) => {
 // Activate a license
 app.patch('/activation/:licenseId', (req, res) => {
     const licenseId = req.params.licenseId;
+    const email = req.body.email;
 
     return firebaseHelper.firestore
         .checkDocumentExists(db, licensesCollection, licenseId)
         .then(result => {
             const notExists = !result.exists;
             const doc = result.data || {};
-            const hasTokenButNotRegular = () => doc.token && !doc.regular;
+            const matchEmail = doc.emails.indexOf(email) >= 0;
+            const hasTokenButIsRegular = () => doc.token && doc.regular;
+            const hasTokenMatchEmail = () => doc.token && matchEmail;
+            const noTokenButIsRegular = () => !doc.token && doc.regular;
+            const noTokenMatchEmail = () => !doc.token && matchEmail;
 
             if (notExists) {
                 res.send({ message: `${licenseId} is not correct` });
-            } else if (hasTokenButNotRegular()) {
-                res.send({ message: `${licenseId} activated already` });
+            } else if (hasTokenButIsRegular()
+                || hasTokenMatchEmail()) {
+                res.send({ data: doc.token });
+            } else if (noTokenButIsRegular()
+                || noTokenMatchEmail()) {
+                generateToken();
             } else {
+                res.send({ message: `${licenseId} activated already` });
+            }
+
+            function generateToken() {
                 const token = uuidv1();
                 console.log(`Activate from Ip:${req.connection.remoteAddress} Token:${token}`);
                 firebaseHelper.firestore
