@@ -74,7 +74,8 @@ app.patch('/activation/:licenseId', (req, res) => {
         .then(result => {
             const notExists = !result.exists;
             const doc = result.data || {};
-            const matchEmail = doc.emails.indexOf(email) >= 0;
+            const emails = doc.emails || [];
+            const matchEmail = emails.indexOf(email) >= 0;
             const hasTokenButIsRegular = () => doc.token && doc.regular;
             const hasTokenMatchEmail = () => doc.token && matchEmail;
             const noTokenButIsRegular = () => !doc.token && doc.regular;
