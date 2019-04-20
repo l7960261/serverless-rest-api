@@ -33,7 +33,7 @@ app.post('/licenses', (req, res) => {
 
     firebaseHelper.firestore
         .createNewDocument(db, licensesCollection, data)
-    return res.send({ message: 'Create a new license', data: [] });
+    return res.send('Create a new license');
 })
 
 // Update new license
