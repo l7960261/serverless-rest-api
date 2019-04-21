@@ -26,43 +26,43 @@ const licensesCollection = 'licenses';
 export const webApi = functions.https.onRequest(main);
 
 // Add new license
-app.post('/licenses', (req, res) => {
-    var data = Object.assign({}, req.body);
-    data.createdAt = dayjs().add(8, 'hour').format(formatTemplate);
-    data.expiredAt = dayjs(data.createdAt).add(30, 'day').format(formatTemplate);
+// app.post('/licenses', (req, res) => {
+//     var data = Object.assign({}, req.body);
+//     data.createdAt = dayjs().add(8, 'hour').format(formatTemplate);
+//     data.expiredAt = dayjs(data.createdAt).add(30, 'day').format(formatTemplate);
 
-    firebaseHelper.firestore
-        .createNewDocument(db, licensesCollection, data)
-    return res.send('Create a new license');
-})
+//     firebaseHelper.firestore
+//         .createNewDocument(db, licensesCollection, data)
+//     return res.send('Create a new license');
+// })
 
 // Update new license
-app.patch('/licenses/:licenseId', (req, res) => {
-    firebaseHelper.firestore
-        .updateDocument(db, licensesCollection, req.params.licenseId, req.body);
-    return res.send('Update a new license');
-})
+// app.patch('/licenses/:licenseId', (req, res) => {
+//     firebaseHelper.firestore
+//         .updateDocument(db, licensesCollection, req.params.licenseId, req.body);
+//     return res.send('Update a new license');
+// })
 
 // View a license
-app.get('/licenses/:licenseId', (req, res) => {
-    return firebaseHelper.firestore
-        .getDocument(db, licensesCollection, req.params.licenseId)
-        .then(doc => res.status(200).send(doc));
-})
+// app.get('/licenses/:licenseId', (req, res) => {
+//     return firebaseHelper.firestore
+//         .getDocument(db, licensesCollection, req.params.licenseId)
+//         .then(doc => res.status(200).send(doc));
+// })
 
 // View all licenses
-app.get('/licenses', (req, res) => {
-    return firebaseHelper.firestore
-        .backup(db, licensesCollection)
-        .then(data => res.status(200).send(data))
-})
+// app.get('/licenses', (req, res) => {
+//     return firebaseHelper.firestore
+//         .backup(db, licensesCollection)
+//         .then(data => res.status(200).send(data))
+// })
 
 // Delete a license 
-app.delete('/licenses/:licenseId', (req, res) => {
-    firebaseHelper.firestore
-        .deleteDocument(db, licensesCollection, req.params.licenseId);
-    return res.send('License is deleted');
-})
+// app.delete('/licenses/:licenseId', (req, res) => {
+//     firebaseHelper.firestore
+//         .deleteDocument(db, licensesCollection, req.params.licenseId);
+//     return res.send('License is deleted');
+// })
 
 // Activate a license
 app.patch('/activation/:licenseId', (req, res) => {
