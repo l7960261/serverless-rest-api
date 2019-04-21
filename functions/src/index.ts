@@ -82,6 +82,7 @@ app.patch('/activation/:licenseId', (req, res) => {
             const noTokenMatchEmail = () => !doc.token && matchEmail;
 
             if (notExists) {
+                console.log(`licenseId: ${licenseId}, email:${email}`);
                 res.send({ message: `${licenseId} is not correct` });
             } else if (hasTokenButIsRegular()
                 || hasTokenMatchEmail()) {
@@ -90,6 +91,7 @@ app.patch('/activation/:licenseId', (req, res) => {
                 || noTokenMatchEmail()) {
                 generateToken();
             } else {
+                console.log(`licenseId: ${licenseId}, email:${email}`);
                 res.send({ message: `${licenseId} activated already` });
             }
 
@@ -118,9 +120,11 @@ app.post('/authorization', (req, res) => {
 
                 if (data.regular) {
                     console.log(`Authorization is regular, Ip:${req.connection.remoteAddress}`);
+                    console.log(`Req body: ${JSON.stringify(req.body)}`);
                     res.send({ data: data.authorizations });
                 } else if (token != data.token) {
                     console.log(`Authorization is token error, Ip:${req.connection.remoteAddress} Info:${JSON.stringify(data)}`);
+                    console.log(`Req body: ${JSON.stringify(req.body)}`);
                     res.send({ message: `${licenseId} 尚未驗證`, data: [] });
                 } else {
                     const currentTime = dayjs().add(8, 'hour');
@@ -129,6 +133,7 @@ app.post('/authorization', (req, res) => {
                         res.send({ data: data.authorizations });
                     } else {
                         console.log(`Authorization is expired, Ip:${req.connection.remoteAddress} Info:${JSON.stringify(data)}`);
+                        console.log(`Req body: ${JSON.stringify(req.body)}`);
                         res.send({ message: `${licenseId} 已過期`, data: [] });
                     }
                 }
