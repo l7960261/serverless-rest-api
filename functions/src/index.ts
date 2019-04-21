@@ -82,7 +82,7 @@ app.patch('/activation/:licenseId', (req, res) => {
             const noTokenMatchEmail = () => !doc.token && matchEmail;
 
             if (notExists) {
-                console.log(`licenseId: ${licenseId}, email:${email}`);
+                console.log(`licenseId: ${licenseId} is not exist`);
                 res.send({ message: `${licenseId} is not correct` });
             } else if (hasTokenButIsRegular()
                 || hasTokenMatchEmail()) {
@@ -91,7 +91,7 @@ app.patch('/activation/:licenseId', (req, res) => {
                 || noTokenMatchEmail()) {
                 generateToken();
             } else {
-                console.log(`licenseId: ${licenseId}, email:${email}`);
+                console.log(`Activate error licenseId: ${licenseId}, email:${email}`);
                 res.send({ message: `${licenseId} activated already` });
             }
 
