@@ -20,6 +20,7 @@ main.use('/api/v1', app);
 main.use(bodyParser.json());
 main.use(bodyParser.urlencoded({ extended: false }));
 
+const TimeZoneTaipei = () => dayjs().add(8, 'hour');
 const formatTemplate = 'YYYY-MM-DD HH:mm:ss';
 const licensesCollection = 'licenses';
 
@@ -28,7 +29,7 @@ export const webApi = functions.https.onRequest(main);
 // Add new license
 // app.post('/licenses', (req, res) => {
 //     var data = Object.assign({}, req.body);
-//     data.createdAt = dayjs().add(8, 'hour').format(formatTemplate);
+//     data.createdAt = TimeZoneTaipei().format(formatTemplate);
 //     data.expiredAt = dayjs(data.createdAt).add(30, 'day').format(formatTemplate);
 
 //     firebaseHelper.firestore
@@ -127,7 +128,7 @@ app.post('/authorization', (req, res) => {
                     console.log(`Req body: ${JSON.stringify(req.body)}`);
                     res.send({ message: `${licenseId} 尚未驗證`, data: [] });
                 } else {
-                    const currentTime = dayjs().add(8, 'hour');
+                    const currentTime = TimeZoneTaipei();
                     const expiredAt = dayjs(data.expiredAt);
                     if (currentTime.isBefore(expiredAt)) {
                         res.send({ data: data.authorizations });
@@ -139,4 +140,12 @@ app.post('/authorization', (req, res) => {
                 }
             }
         });
-});
+})
+
+// Get server time
+app.get('/time/taipei', (req, res) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+    return res.status(200)
+        .send({ data: TimeZoneTaipei().format(formatTemplate) });
+})
