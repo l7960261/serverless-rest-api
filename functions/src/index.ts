@@ -77,19 +77,15 @@ app.patch('/activation/:licenseId', (req, res) => {
             const doc = result.data || {};
             const emails = doc.emails || [];
             const matchEmail = emails.indexOf(email) >= 0;
-            const hasTokenButIsRegular = () => doc.token && doc.regular;
             const hasTokenMatchEmail = () => doc.token && matchEmail;
-            const noTokenButIsRegular = () => !doc.token && doc.regular;
             const noTokenMatchEmail = () => !doc.token && matchEmail;
 
             if (notExists) {
                 console.log(`licenseId: ${licenseId} is not exist`);
                 res.send({ message: `${licenseId} is not correct` });
-            } else if (hasTokenButIsRegular()
-                || hasTokenMatchEmail()) {
+            } else if (hasTokenMatchEmail()) {
                 res.send({ data: doc.token });
-            } else if (noTokenButIsRegular()
-                || noTokenMatchEmail()) {
+            } else if (noTokenMatchEmail()) {
                 generateToken();
             } else {
                 console.log(`Activate error licenseId: ${licenseId}, email:${email}`);
@@ -119,11 +115,7 @@ app.post('/authorization', (req, res) => {
             } else {
                 const data = result.data;
 
-                if (data.regular) {
-                    console.log(`Authorization is regular, Ip:${req.connection.remoteAddress}`);
-                    console.log(`Req body: ${JSON.stringify(req.body)}`);
-                    res.send({ data: data.authorizations });
-                } else if (token != data.token) {
+                if (token != data.token) {
                     console.log(`Authorization is token error, Ip:${req.connection.remoteAddress} Info:${JSON.stringify(data)}`);
                     console.log(`Req body: ${JSON.stringify(req.body)}`);
                     res.send({ message: `${licenseId} 尚未驗證`, data: [] });
