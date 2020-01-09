@@ -1,11 +1,14 @@
-import * as bodyParser from "body-parser";
 import express from 'express';
+import * as bodyParser from 'body-parser';
+
 import admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import * as firebaseHelper from 'firebase-functions-helper';
 import serviceAccount from './serviceAccountKey.json';
+
 import dayjs from 'dayjs';
 import uuidv1 from 'uuid/v1';
+import { filesUpload } from './middleware';
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount as any),
@@ -13,57 +16,19 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
+const bucket = admin.storage().bucket('gs://deliveryorder-b9b84.appspot.com');
 const app = express();
 const main = express();
 
-main.use('/api/v1', app);
 main.use(bodyParser.json());
 main.use(bodyParser.urlencoded({ extended: false }));
+main.use('/api/v1', app);
 
 const TimeZoneTaipei = () => dayjs().add(8, 'hour');
 const formatTemplate = 'YYYY-MM-DD HH:mm:ss';
 const licensesCollection = 'licenses';
 
 export const webApi = functions.https.onRequest(main);
-
-// Add new license
-// app.post('/licenses', (req, res) => {
-//     var data = Object.assign({}, req.body);
-//     data.createdAt = TimeZoneTaipei().format(formatTemplate);
-//     data.expiredAt = dayjs(data.createdAt).add(30, 'day').format(formatTemplate);
-
-//     firebaseHelper.firestore
-//         .createNewDocument(db, licensesCollection, data)
-//     return res.send('Create a new license');
-// })
-
-// Update new license
-// app.patch('/licenses/:licenseId', (req, res) => {
-//     firebaseHelper.firestore
-//         .updateDocument(db, licensesCollection, req.params.licenseId, req.body);
-//     return res.send('Update a new license');
-// })
-
-// View a license
-// app.get('/licenses/:licenseId', (req, res) => {
-//     return firebaseHelper.firestore
-//         .getDocument(db, licensesCollection, req.params.licenseId)
-//         .then(doc => res.status(200).send(doc));
-// })
-
-// View all licenses
-// app.get('/licenses', (req, res) => {
-//     return firebaseHelper.firestore
-//         .backup(db, licensesCollection)
-//         .then(data => res.status(200).send(data))
-// })
-
-// Delete a license 
-// app.delete('/licenses/:licenseId', (req, res) => {
-//     firebaseHelper.firestore
-//         .deleteDocument(db, licensesCollection, req.params.licenseId);
-//     return res.send('License is deleted');
-// })
 
 // Activate a license
 app.patch('/activation/:licenseId', (req, res) => {
@@ -141,3 +106,37 @@ app.get('/time/taipei', (req, res) => {
     return res.status(200)
         .send({ data: TimeZoneTaipei().format(formatTemplate) });
 })
+
+// Post upload image
+app.post('/image/upload', filesUpload, (req, res, next) => {
+    const [file] = req['files'];
+
+    let fileUpload = bucket.file(file.originalname);
+    const blobStream = fileUpload.createWriteStream({
+        metadata: {
+            contentType: file.mimetype
+        }
+    });
+    blobStream.on('error', (error) => {
+        res.send({
+            success: false,
+            error,
+        })
+    });
+
+    blobStream.on('finish', () => {
+        // The public URL can be used to directly access the file via HTTP.
+        console.log(file);
+        fileUpload.getSignedUrl({
+            action: 'read',
+            expires: Date.now() + 60000 * 60 * 24 * 365 * 5, // 5 years
+        }, (err, url) => {
+            res.send({
+                success: true,
+                url,
+            });
+        });
+    });
+
+    blobStream.end(file.buffer);
+});
