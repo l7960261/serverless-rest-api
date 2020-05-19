@@ -32,6 +32,8 @@ export const webApi = functions.https.onRequest(main);
 
 // Activate a license
 app.patch('/activation/:license', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   const { license } = req.params;
   const { email } = req.body;
 
@@ -69,6 +71,8 @@ app.patch('/activation/:license', (req, res) => {
 
 // Authorization
 app.post('/authorization', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   const { license, token } = req.body;
 
   return firebaseHelper.firestore
