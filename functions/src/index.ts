@@ -30,10 +30,23 @@ const licensesCollection = 'licenses';
 
 export const webApi = functions.https.onRequest(main);
 
+app.all('*', function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  res.header("Access-Control-Allow-Methods", "PATCH,POST,GET,OPTIONS");
+  res.header("X-Powered-By", ' 3.2.1')
+  //这段仅仅为了方便返回json而已
+  res.header("Content-Type", "application/json;charset=utf-8");
+  if (req.method == 'OPTIONS') {
+    //让options请求快速返回
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
+
 // Activate a license
 app.patch('/activation/:license', (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   const { license } = req.params;
   const { email } = req.body;
 
@@ -71,8 +84,6 @@ app.patch('/activation/:license', (req, res) => {
 
 // Authorization
 app.post('/authorization', (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   const { license, token } = req.body;
 
   return firebaseHelper.firestore
@@ -104,8 +115,6 @@ app.post('/authorization', (req, res) => {
 
 // Get server time
 app.get('/time/taipei', (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   return res.status(200)
     .send({ data: TimeZoneTaipei().format(formatTemplate) });
 })
